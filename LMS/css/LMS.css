@@ -1,0 +1,15 @@
+#MainDropDown span .IconButtonClass {
+  height: 10px !important;
+  background-color: transparent;
+}
+
+.ms-Dropdown-title {
+  height: auto;
+  white-space: normal;
+  text-overflow: clip;
+}
+
+.ms-Checkbox-checkbox {
+  border: 0px;
+  border-radius: 10px;
+}
