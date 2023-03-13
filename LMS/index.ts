@@ -6,7 +6,6 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
   private notifyOutputChanged: () => void;
   private selectedOptions: string[];
   private initialValues: string[];
-  private entityColumns: string;
 
   /**
    * Empty constructor.
@@ -29,7 +28,6 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     let initialSelectedValues = context.parameters.multiSelectedValues.raw!;
     this.initialValues =
       initialSelectedValues == null ? [] : initialSelectedValues.split(",");
-    this.entityColumns = context.parameters.entityPrimaryColumns.raw!;
   }
 
   /**
@@ -44,8 +42,13 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
       onChange: this.onChange,
       initialValues: this.initialValues,
       context: context,
-      entityType: context.parameters.entityType.raw!,
-      entityColumns: this.entityColumns.split(","),
+      relatedEntityType: context.parameters.relatedEntityType.raw!,
+      relatedPrimaryColumns:
+        context.parameters.relatedPrimaryColumns.raw!.split(","),
+      primaryEntityType: context.parameters.primaryEntityType.raw!,
+      relationshipName: context.parameters.relationshipName.raw!,
+      primaryEntityId: context.parameters.primaryEntityId.raw!,
+      isEnabled: context.mode.isControlDisabled,
     };
     return React.createElement(LookupMultiSel, props);
   }

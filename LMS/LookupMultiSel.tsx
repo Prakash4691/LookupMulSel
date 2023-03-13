@@ -12,6 +12,7 @@ import { Icon } from "@fluentui/react/lib/Icon";
 import { SearchBox } from "@fluentui/react/lib/SearchBox";
 import { FontSizes, ISearchBoxStyles, ITheme } from "@fluentui/react";
 //import { Sticky } from "@fluentui/react";
+import { Associate, DisAssociate } from "./WebApiOperations";
 
 const dropdownStyles: Partial<IDropdownStyles> = {
   dropdown: { width: 500, height: "auto" },
@@ -27,12 +28,26 @@ export interface ILookupMultiSel {
   onChange: (selectedValues: string[]) => void;
   initialValues: string[];
   context: ComponentFramework.Context<IInputs>;
-  entityType: string;
-  entityColumns: string[];
+  relatedEntityType: string;
+  relatedPrimaryColumns: string[];
+  primaryEntityType: string;
+  relationshipName: string;
+  primaryEntityId: string;
+  isEnabled: boolean;
 }
 
 export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
-  const { onChange, initialValues, context, entityType, entityColumns } = props;
+  const {
+    onChange,
+    initialValues,
+    context,
+    relatedEntityType,
+    relatedPrimaryColumns,
+    primaryEntityType,
+    relationshipName,
+    primaryEntityId,
+    isEnabled,
+  } = props;
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
   const [userOptions, setUserOptions] = React.useState<IDropdownOption[]>([]);
   const onChangeTriggered = React.useRef(false);
@@ -50,16 +65,20 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
    */
   React.useEffect(() => {
     let userOptionsList: IDropdownOption[] = [];
-    context.webAPI.retrieveMultipleRecords(entityType).then((response) => {
-      response.entities.forEach((element) => {
-        userOptionsList.push({
-          key: element[entityColumns[0]],
-          text: element[entityColumns[1]],
-          data: { value: element[entityColumns[0]] },
+    context.webAPI
+      .retrieveMultipleRecords(relatedEntityType)
+      .then((response) => {
+        response.entities.forEach((element) => {
+          userOptionsList.push({
+            key: element[relatedPrimaryColumns[0]],
+            text: element[relatedPrimaryColumns[1]],
+            data: { value: element[relatedPrimaryColumns[0]] },
+          });
         });
+        setUserOptions(userOptionsList);
       });
-      setUserOptions(userOptionsList);
-    });
+    /* let userOptionsList = RetrieveMultiple(context, entityType, entityColumns);
+    setUserOptions(userOptionsList); */
   }, []);
 
   /**
@@ -95,6 +114,22 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
           : selectedValues.filter((key) => key != option.key)
       );
     }
+
+    if (option?.selected)
+      Associate(
+        option.key,
+        primaryEntityType,
+        relatedEntityType,
+        relationshipName,
+        primaryEntityId
+      );
+    else if (!option?.selected)
+      DisAssociate(
+        option?.key!,
+        primaryEntityType,
+        relationshipName,
+        primaryEntityId
+      );
   };
 
   /**
@@ -186,6 +221,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
         onRenderCaretDown={onRenderCaretDown}
         onRenderOption={onRenderOption}
         onDismiss={() => setSearchText("")}
+        disabled={isEnabled}
       />
       {/* </Stack> */}
     </>
