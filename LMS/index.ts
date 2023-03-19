@@ -43,8 +43,9 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
       initialValues: this.initialValues,
       context: context,
       relatedEntityType: context.parameters.relatedEntityType.raw!,
-      relatedPrimaryColumns:
-        context.parameters.relatedPrimaryColumns.raw!.split(","),
+      relatedPrimaryColumns: context.parameters.relatedPrimaryColumns
+        .raw!.split(",")
+        .map((value) => value.trim()),
       primaryEntityType: context.parameters.primaryEntityType.raw!,
       relationshipName: context.parameters.relationshipName.raw!,
       primaryEntityId: context.parameters.primaryEntityId.raw!,

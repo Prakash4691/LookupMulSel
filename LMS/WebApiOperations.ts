@@ -1,5 +1,8 @@
 /*global Xrm */
 /*eslint no-undef: "error"*/
+
+import { IInputs } from "./generated/ManifestTypes";
+
 //@ts-ignore
 const url: string = Xrm.Utility.getGlobalContext().getClientUrl();
 
@@ -12,12 +15,15 @@ const url: string = Xrm.Utility.getGlobalContext().getClientUrl();
  * @param primaryEntityId
  */
 export const Associate = (
+  context: ComponentFramework.Context<IInputs>,
   selectedKey: string | number,
   primaryEntityType: string,
   relatedEntityType: string,
   relationshipName: string,
   primaryEntityId: string
 ) => {
+  let error: any =
+    "Issue while associating the record. Kindly check the configuration.";
   var association = {
     "@odata.id": url + `/api/data/v9.1/${relatedEntityType}s(${selectedKey})`,
   };
@@ -38,7 +44,7 @@ export const Associate = (
       if (this.status === 204 || this.status === 1223) {
         console.log("Associated");
       } else {
-        console.log(this.statusText);
+        context.navigation.openAlertDialog(error);
       }
     }
   };
@@ -53,11 +59,14 @@ export const Associate = (
  * @param primaryEntityId
  */
 export const DisAssociate = (
+  context: ComponentFramework.Context<IInputs>,
   removedKey: string | number,
   primaryEntityType: string,
   relationshipName: string,
   primaryEntityId: string
 ) => {
+  let error: any =
+    "Issue while disassociating the record. Kindly check the configuration.";
   var req = new XMLHttpRequest();
   req.open(
     "DELETE",
@@ -75,7 +84,7 @@ export const DisAssociate = (
       if (this.status === 204 || this.status === 1223) {
         console.log("Disassociated");
       } else {
-        console.log(this.statusText);
+        context.navigation.openAlertDialog(error);
       }
     }
   };

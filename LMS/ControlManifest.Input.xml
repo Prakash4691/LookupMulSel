@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="LookUpMulSel" constructor="LMS" version="0.0.46" display-name-key="LMS" description-key="LMS description" control-type="virtual" >
+  <control namespace="LookUpMulSel" constructor="LMS" version="0.0.48" display-name-key="LMS" description-key="LMS description" control-type="virtual" >
     <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
     If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
     Example1:
@@ -18,12 +18,12 @@
       -->
     </external-service-usage>
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
-    <property name="multiSelectedValues" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type="SingleLine.Text" usage="bound" required="true" />
-    <property name="relatedEntityType" display-name-key="relatedEntityType_Display_Key" description-key="relatedEntityType_Desc_Key" of-type="SingleLine.Text" usage="input" />
-    <property name="relatedPrimaryColumns" display-name-key="relatedPrimaryColumns_Display_Key" description-key="relatedPrimaryColumns_Desc_Key" usage="input" of-type="SingleLine.Text" />
-    <property name="primaryEntityType" display-name-key="primaryEntityType_Display_Key" description-key="primaryEntityType_Desc_Key" usage="input" of-type="SingleLine.Text"/>
-    <property name="relationshipName" display-name-key="relationshipName_Display_Key" description-key="relationshipName_Desc_Key" usage="input" of-type="SingleLine.Text" />
-    <property name="primaryEntityId" display-name-key="primaryEntityId_Display_Key" description-key="primaryEntityId_Desc_Key" usage="bound" of-type="SingleLine.Text" />
+    <property name="multiSelectedValues" display-name-key="Multi Select Lookup Values" description-key="Selected values in comma seperated" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="relatedEntityType" display-name-key="Related Entity Type" description-key="Related entity type" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="relatedPrimaryColumns" display-name-key="Related Primary Columns" description-key="Primary columns should be in following format. Ex: primarykeyid, primaycolumn(name)" usage="input" of-type="SingleLine.Text" required="true" />
+    <property name="primaryEntityType" display-name-key="Primary Entity Type" description-key="Primary entity Type" usage="input" of-type="SingleLine.Text" required="true"/>
+    <property name="relationshipName" display-name-key="Relationship Name" description-key="N:N relationship name" usage="input" of-type="SingleLine.Text" required="true"/>
+    <property name="primaryEntityId" display-name-key="Primary Entity ID" description-key="Bind the property to ID of primary entity" usage="bound" of-type="SingleLine.Text" required="true"/>
     <!--
       Property node's of-type attribute can be of-type-group attribute.
       Example:

@@ -76,6 +76,9 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
           });
         });
         setUserOptions(userOptionsList);
+      })
+      .catch((error) => {
+        context.navigation.openAlertDialog(error);
       });
     /* let userOptionsList = RetrieveMultiple(context, entityType, entityColumns);
     setUserOptions(userOptionsList); */
@@ -117,6 +120,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
 
     if (option?.selected)
       Associate(
+        context,
         option.key,
         primaryEntityType,
         relatedEntityType,
@@ -125,6 +129,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
       );
     else if (!option?.selected)
       DisAssociate(
+        context,
         option?.key!,
         primaryEntityType,
         relationshipName,
