@@ -1,3 +1,4 @@
+import { Mode } from "fs";
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { ILookupMultiSel, LookupMultiSel } from "./LookupMultiSel";
 import * as React from "react";
@@ -50,6 +51,7 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
       relationshipName: context.parameters.relationshipName.raw!,
       primaryEntityId: context.parameters.primaryEntityId.raw!,
       isEnabled: context.mode.isControlDisabled,
+      maxPageSize: context.parameters.maxPageSize.raw!,
     };
     return React.createElement(LookupMultiSel, props);
   }

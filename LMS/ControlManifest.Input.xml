@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="LookUpMulSel" constructor="LMS" version="0.0.48" display-name-key="LMS" description-key="LMS description" control-type="virtual" >
+  <control namespace="LookUpMulSel" constructor="LMS" version="1.3.0" display-name-key="LMS" description-key="LMS description" control-type="virtual">
     <!--external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add the external domain it is using.
     If it is not using any external service, please set the enabled="false" and DO NOT add any domain below. The "enabled" will be false by default.
     Example1:
@@ -24,6 +24,7 @@
     <property name="primaryEntityType" display-name-key="Primary Entity Type" description-key="Primary entity Type" usage="input" of-type="SingleLine.Text" required="true"/>
     <property name="relationshipName" display-name-key="Relationship Name" description-key="N:N relationship name" usage="input" of-type="SingleLine.Text" required="true"/>
     <property name="primaryEntityId" display-name-key="Primary Entity ID" description-key="Bind the property to ID of primary entity" usage="bound" of-type="SingleLine.Text" required="true"/>
+    <property name="maxPageSize" display-name-key="Max Page Size" description-key="Number of records to be displayed in the lookup" of-type="Whole.None" usage="input" required="true" />
     <!--
       Property node's of-type attribute can be of-type-group attribute.
       Example:
