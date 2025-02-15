@@ -25,19 +25,30 @@ const searchBoxStyles: Partial<ISearchBoxStyles> = {
 };
 const buttonStyles: IButtonStyles = { icon: { fontSize: "11px" } };
 
+/**
+ * Interface for LookupMultiSel component props
+ */
 export interface ILookupMultiSel {
-  onChange: (selectedValues: string[]) => void;
-  initialValues: string[];
-  context: ComponentFramework.Context<IInputs>;
-  relatedEntityType: string;
-  relatedPrimaryColumns: string[];
-  primaryEntityType: string;
-  relationshipName: string;
-  primaryEntityId: string;
-  isEnabled: boolean;
-  maxPageSize: number;
+  onChange: (selectedValues: string[]) => void; // Callback when selection changes
+  initialValues: string[]; // Initially selected values
+  context: ComponentFramework.Context<IInputs>; // Component context
+  relatedEntityType: string; // Type of related entity
+  relatedPrimaryColumns: string[]; // Primary columns of related entity
+  primaryEntityType: string; // Type of primary entity
+  relationshipName: string; // Name of the relationship
+  primaryEntityId: string; // ID of the primary entity
+  disabled: boolean; // Whether the control is disabled
+  maxPageSize: number; // Maximum number of records per page
 }
 
+/**
+ * A multi-select lookup component that allows users to search and select multiple related records
+ * Features include:
+ * - Search functionality
+ * - Pagination support
+ * - Associate/Disassociate operations
+ * - Custom rendering of selected items with remove buttons
+ */
 export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
   const {
     onChange,
@@ -48,11 +59,19 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
     primaryEntityType,
     relationshipName,
     primaryEntityId,
-    isEnabled,
+    disabled,
   } = props;
 
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
-  const [userOptions, setUserOptions] = React.useState<IDropdownOption[]>([]);
+  const [filteredRelatedRecords, setFilteredRelatedRecords] = React.useState<
+    IDropdownOption[]
+  >([]);
+  const [fullRelatedRecords, setFullRelatedRecords] = React.useState<
+    IDropdownOption[]
+  >([]);
+  const [selectedOptions, setSelectedOptions] = React.useState<
+    IDropdownOption[]
+  >([]);
   const onChangeTriggered = React.useRef(false);
   const [searchText, setSearchText] = React.useState<string>("");
   const [IsLoadMoreButtonDisabled, setLoadMoreButtonDisabled] =
@@ -67,67 +86,87 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
   const [ispreviousButtonClicked, setIspreviousButtonClicked] =
     React.useState<boolean>(false);
 
-  const fetchRecords = async (isPrevious?: boolean) =>
-    //isPrevious?: boolean,
-    //previousPageNumber?: number
-    {
-      let userOptionsList: IDropdownOption[] = [];
-      let query = setStateValuesAndRetrieveQuery(isPrevious);
-      /*let updatedCookie: string = "";
-    if (pagingCookieValue && isPrevious && previousPageNumber! > 1) {
-      updatedCookie = updatePageNumberInCookie(
-        pagingCookieValue,
-        previousPageNumber!
+  /**
+   * Fetches records from the related entity with optional paging
+   * @param isPrevious - Boolean flag indicating if fetching previous page
+   */
+  const fetchRecords = async (isPrevious?: boolean) => {
+    let userOptionsList: IDropdownOption[] = [];
+    let query = setStateValuesAndRetrieveQuery(isPrevious);
+
+    try {
+      let response = await context.webAPI.retrieveMultipleRecords(
+        relatedEntityType,
+        query,
+        props.maxPageSize
       );
-      query += `&$skiptoken=${updatedCookie}`;
-    } else if (pagingCookieValue && pageNumber > 1) {
-      query += `&$skiptoken=${pagingCookieValue}`;
-    }*/
-      try {
-        let response = await context.webAPI.retrieveMultipleRecords(
-          relatedEntityType,
-          query,
-          props.maxPageSize
-        );
 
-        response.entities.map((element) => {
-          userOptionsList.push({
-            key: element[relatedPrimaryColumns[0]],
-            text: element[relatedPrimaryColumns[1]],
-            data: { value: element[relatedPrimaryColumns[0]] },
-          });
+      response.entities.map((element) => {
+        userOptionsList.push({
+          key: element[relatedPrimaryColumns[0]],
+          text: element[relatedPrimaryColumns[1]],
+          data: { value: element[relatedPrimaryColumns[0]] },
         });
+      });
 
-        /*if (updatedCookie) {
+      /*if (updatedCookie) {
         setPagingCookie(updatedCookie);
         setLoadMoreButtonDisabled(false);
       } else */
-        if (response.nextLink) {
-          const nextLink = response.nextLink;
-          const skipTokenParam = "$skiptoken=";
-          const skipTokenIndex = nextLink.indexOf(skipTokenParam);
-          if (skipTokenIndex !== -1) {
-            const nextPageCookie = nextLink.substring(
-              skipTokenIndex + skipTokenParam.length
-            );
-            setPagingCookie(nextPageCookie);
-            setLoadMoreButtonDisabled(false);
-          }
-        } else {
-          setLoadMoreButtonDisabled(true);
+      if (response.nextLink) {
+        const nextLink = response.nextLink;
+        const skipTokenParam = "$skiptoken=";
+        const skipTokenIndex = nextLink.indexOf(skipTokenParam);
+        if (skipTokenIndex !== -1) {
+          const nextPageCookie = nextLink.substring(
+            skipTokenIndex + skipTokenParam.length
+          );
+          setPagingCookie(nextPageCookie);
+          setLoadMoreButtonDisabled(false);
         }
-
-        //setUserOptions([...userOptions, ...userOptionsList]);
-        setUserOptions(userOptionsList);
-      } catch (error) {
-        context.navigation.openAlertDialog({ text: (error as Error).message });
+      } else {
+        setLoadMoreButtonDisabled(true);
       }
-    };
+
+      //setUserOptions([...userOptions, ...userOptionsList]);
+      setFilteredRelatedRecords(userOptionsList);
+    } catch (error) {
+      context.navigation.openAlertDialog({ text: (error as Error).message });
+    }
+  };
 
   /**
-   * Set state values and retrieve query
-   * @param isPrevious
-   * @returns
+   * Fetches all records from the related entity without paging
+   * Used to populate the full list of related records and initialize selected options
+   */
+  const fetchAllRecords = async () => {
+    let userOptionsList: IDropdownOption[] = [];
+    let response = await context.webAPI.retrieveMultipleRecords(
+      relatedEntityType,
+      `?$select=${relatedPrimaryColumns.join(",")}`
+    );
+
+    response.entities.map((element) => {
+      userOptionsList.push({
+        key: element[relatedPrimaryColumns[0]],
+        text: element[relatedPrimaryColumns[1]],
+        data: { value: element[relatedPrimaryColumns[0]] },
+      });
+    });
+
+    setSelectedOptions(
+      userOptionsList.filter((opt) =>
+        props.initialValues.includes(opt.key as string)
+      )
+    );
+
+    setFullRelatedRecords(userOptionsList);
+  };
+
+  /**
+   * Prepares the query string and updates paging-related state values
+   * @param isPrevious - Boolean flag indicating if fetching previous page
+   * @returns Query string for the WebAPI call
    */
   const setStateValuesAndRetrieveQuery = (isPrevious?: boolean) => {
     setLoadMoreButtonDisabled(true);
@@ -167,10 +206,10 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
   };
 
   /**
-   *
-   * @param cookie
-   * @param newPageNumber
-   * @returns
+   * Updates the page number in the paging cookie string
+   * @param cookie - The current paging cookie string
+   * @param newPageNumber - The new page number to set
+   * @returns Updated cookie string with new page number
    */
   const updatePageNumberInCookie = (cookie: string, newPageNumber: number) => {
     const pageNumberRegex = /pagenumber=%22(\d+)%22/;
@@ -184,6 +223,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
   React.useEffect(() => {
     fetchRecords();
     setSelectedValues(initialValues);
+    fetchAllRecords();
   }, []);
 
   /**
@@ -192,33 +232,40 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
   React.useEffect(() => {
     let selectedValueOptions: string[] = [];
     selectedValueOptions.push(selectedValues.toString());
+
+    if (selectedValues)
+      setSelectedOptions(
+        fullRelatedRecords.filter((opt) =>
+          selectedValues.includes(opt.key as string)
+        )
+      );
+
     if (onChangeTriggered.current) onChange(selectedValueOptions);
   }, [selectedValues]);
 
   /**
-   * Triggers on change of dropdown
-   * @param ev Event of the dropdown
-   * @param option Selected option from dropdown
-   * @param eventId Event to identify is it for dropdown or cancel icon
+   * Handles changes in dropdown selection or cancel icon clicks
+   * @param ev - Event object
+   * @param option - The dropdown option that was selected/deselected
+   * @param eventId - Optional identifier to distinguish between dropdown and cancel icon events (1 for cancel icon)
    */
   const onChangeDropDownOrOnIconClick = (
     ev: unknown,
     option?: IDropdownOption,
     eventId?: number
   ) => {
+    if (!option) return;
+
     if (eventId === 1) {
-      let iconEvent = ev as React.MouseEvent<HTMLButtonElement>;
-      iconEvent.stopPropagation();
+      (ev as React.MouseEvent<HTMLButtonElement>).stopPropagation();
     }
 
-    if (option) {
-      onChangeTriggered.current = true;
-      setSelectedValues(
-        option.selected
-          ? [...selectedValues, option.key as string]
-          : selectedValues.filter((key) => key != option.key)
-      );
-    }
+    onChangeTriggered.current = true;
+    setSelectedValues(
+      option.selected
+        ? [...selectedValues, option.key as string]
+        : selectedValues.filter((key) => key !== option.key)
+    );
 
     if (option?.selected)
       Associate(
@@ -229,7 +276,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
         relationshipName,
         primaryEntityId
       );
-    else if (!option?.selected)
+    else
       DisAssociate(
         context,
         option?.key!,
@@ -240,56 +287,60 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
   };
 
   /**
-   *Render icon of the dropdown to search
-   * @returns Icon
+   * Renders the search icon in place of the default dropdown caret
+   * @returns Icon component
    */
   const onRenderCaretDown = () => {
     return <Icon iconName="Search"></Icon>;
   };
 
   /**
-   * Render drop down item event
-   * @param option Drop down item
-   * @returns
+   * Custom renderer for dropdown options
+   * Renders either a search box for the header or the option text
+   * @param option - The dropdown option to render
+   * @returns Rendered component
    */
   const onRenderOption = (option?: IDropdownOption) => {
-    return option?.itemType === DropdownMenuItemType.Header &&
-      option.key === "FilterHeader" ? (
-      <SearchBox
-        onChange={(ev, newValue?: string) => setSearchText(newValue!)}
-        underlined={true}
-        placeholder="Search options"
-        autoFocus={true}
-        styles={searchBoxStyles}
-      ></SearchBox>
-    ) : (
-      <>{option?.text}</>
-    );
+    if (!option) return null;
+    if (
+      option.itemType === DropdownMenuItemType.Header &&
+      option.key === "FilterHeader"
+    ) {
+      return (
+        <SearchBox
+          onChange={(ev, newValue?: string) => setSearchText(newValue!)}
+          underlined={true}
+          placeholder="Search options"
+          autoFocus={true}
+          styles={searchBoxStyles}
+        />
+      );
+    }
+    return <>{option.text}</>;
   };
 
   /**
-   * Render custom title
-   * @param options Selected option from dropdown
-   * @returns
+   * Custom renderer for the dropdown title
+   * Renders selected options with cancel icons
+   * @returns Rendered component with selected options
    */
-  const onRenderTitle = (options: any) => {
-    let option: any[] = [];
-    let selectedList: IDropdownOption[] = options;
-    selectedList.forEach((element) => {
-      option.push(
-        <span>
-          {element.text}
-          <IconButton
-            iconProps={{ iconName: "Cancel" }}
-            title={element.text}
-            onClick={(ev) => onChangeDropDownOrOnIconClick(ev, element, 1)}
-            className="IconButtonClass"
-            styles={buttonStyles}
-          ></IconButton>
-        </span>
-      );
-    });
-    return <div>{option}</div>;
+  const onRenderTitle = () => {
+    return (
+      <div>
+        {selectedOptions?.map((option) => (
+          <span key={option.key}>
+            {option.text}
+            <IconButton
+              iconProps={{ iconName: "Cancel" }}
+              title={option.text}
+              onClick={(ev) => onChangeDropDownOrOnIconClick(ev, option, 1)}
+              className="IconButtonClass"
+              styles={buttonStyles}
+            />
+          </span>
+        ))}
+      </div>
+    );
   };
 
   React.useEffect(() => {
@@ -304,12 +355,20 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
     if (ispreviousButtonClicked) fetchRecords(true);
   }, [ispreviousButtonClicked]);
 
+  /**
+   * Loads the next page of records
+   * Updates page number and triggers record fetch
+   */
   const loadMore = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
     setPreviousButtonDisabled(false);
     setIsLoadMoreButtonClicked(true);
   };
 
+  /**
+   * Loads the previous page of records
+   * Updates page number and triggers record fetch
+   */
   const loadPrevious = () => {
     setPageNumber((prevPageNumber) => prevPageNumber - 1);
     setIspreviousButtonClicked(true);
@@ -322,42 +381,75 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
     }*/
   };
 
+  const mergedOptions = [
+    {
+      key: "FilterHeader",
+      text: "-",
+      itemType: DropdownMenuItemType.Header,
+    },
+    {
+      key: "divider_filterHeader",
+      text: "-",
+      itemType: DropdownMenuItemType.Divider,
+    },
+    ...filteredRelatedRecords.filter((opt) =>
+      opt.text.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
+    ),
+  ];
+
   return (
     <>
       <Dropdown
-        {...userOptions}
-        options={[
-          {
-            key: "FilterHeader",
-            text: "-",
-            itemType: DropdownMenuItemType.Header,
-          },
-          {
-            key: "divider_filterHeader",
-            text: "-",
-            itemType: DropdownMenuItemType.Divider,
-          },
-          ...userOptions.filter(
-            (opt) =>
-              opt.text
-                .toLocaleLowerCase()
-                .indexOf(searchText.toLocaleLowerCase()) > -1
-          ),
-        ]}
+        {...filteredRelatedRecords}
+        options={mergedOptions}
         styles={dropdownStyles}
         multiSelect={true}
         onChange={onChangeDropDownOrOnIconClick}
         selectedKeys={selectedValues}
-        calloutProps={{ directionalHintFixed: true }}
+        // Append a footer by customizing the list rendering
+        onRenderList={(props, defaultRender) => (
+          <div>
+            {defaultRender && defaultRender(props)}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "8px",
+                borderTop: "1px solid #ccc",
+              }}
+            >
+              <Icon
+                iconName="ChevronUp"
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  if (!IsPreviousButtonDisabled) loadPrevious();
+                }}
+                style={{
+                  cursor: IsPreviousButtonDisabled ? "default" : "pointer",
+                }}
+              />
+              <Icon
+                iconName="ChevronDown"
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  if (!IsLoadMoreButtonDisabled) loadMore();
+                }}
+                style={{
+                  cursor: IsLoadMoreButtonDisabled ? "default" : "pointer",
+                }}
+              />
+            </div>
+          </div>
+        )}
         onRenderTitle={onRenderTitle}
         id="MainDropDown"
         placeholder="Look for records"
         onRenderCaretDown={onRenderCaretDown}
         onRenderOption={onRenderOption}
         onDismiss={() => setSearchText("")}
-        disabled={isEnabled}
+        disabled={disabled}
       />
-      <PrimaryButton
+      {/* <PrimaryButton
         text="Previous"
         onClick={loadPrevious}
         disabled={IsPreviousButtonDisabled}
@@ -366,7 +458,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
         text="Load More.."
         onClick={loadMore}
         disabled={IsLoadMoreButtonDisabled}
-      />
+      /> */}
     </>
   );
 });
