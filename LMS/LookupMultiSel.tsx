@@ -33,7 +33,7 @@ export interface ILookupMultiSel {
   primaryEntityType: string;
   relationshipName: string;
   primaryEntityId: string;
-  isEnabled: boolean;
+  disabled: boolean;
 }
 
 export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
@@ -46,7 +46,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
     primaryEntityType,
     relationshipName,
     primaryEntityId,
-    isEnabled,
+    disabled,
   } = props;
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
   const [userOptions, setUserOptions] = React.useState<IDropdownOption[]>([]);
@@ -226,7 +226,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
         onRenderCaretDown={onRenderCaretDown}
         onRenderOption={onRenderOption}
         onDismiss={() => setSearchText("")}
-        disabled={isEnabled}
+        disabled={disabled}
       />
       {/* </Stack> */}
     </>

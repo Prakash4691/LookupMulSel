@@ -49,7 +49,10 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
       primaryEntityType: context.parameters.primaryEntityType.raw!,
       relationshipName: context.parameters.relationshipName.raw!,
       primaryEntityId: context.parameters.primaryEntityId.raw!,
-      isEnabled: context.mode.isControlDisabled,
+      disabled:
+        context.parameters.primaryEntityId.raw! == null
+          ? true
+          : context.mode.isControlDisabled,
     };
     return React.createElement(LookupMultiSel, props);
   }
