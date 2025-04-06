@@ -13,3 +13,64 @@
   border: 0px;
   border-radius: 10px;
 }
+
+.ms-Dropdown-container {
+  width: 100%;
+  position: relative;
+}
+
+.ms-Dropdown {
+  max-width: 100%;
+}
+
+.ms-Dropdown:focus-within {
+  border-color: #0078d4 !important;
+  box-shadow: 0 0 5px rgba(0, 120, 212, 0.5);
+}
+
+.ms-Dropdown:hover {
+  border-color: #333333;
+}
+
+.ms-Callout {
+  box-sizing: border-box;
+}
+
+.ms-Callout-main {
+  max-height: 50vh !important;
+  scrollbar-width: thin; /* For Firefox */
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+.ms-Callout-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ms-Callout-main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.ms-Callout-main::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+/* Ensure dropdown items are properly sized */
+.ms-Dropdown-items {
+  padding: 4px 0;
+}
+
+.ms-Dropdown-item {
+  padding: 0 8px;
+  line-height: 32px;
+}
+
+/* Style for the magnifier icon */
+.ms-Dropdown-caretDown {
+  color: #666666;
+  transition: color 0.2s ease;
+}
+
+.ms-Dropdown:focus-within .ms-Dropdown-caretDown {
+  color: #0078d4;
+}

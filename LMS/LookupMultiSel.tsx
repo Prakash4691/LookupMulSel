@@ -15,7 +15,33 @@ import { FontSizes, ISearchBoxStyles, ITheme } from "@fluentui/react";
 import { Associate, DisAssociate } from "./WebApiOperations";
 
 const dropdownStyles: Partial<IDropdownStyles> = {
-  dropdown: { width: 500, height: "auto" },
+  dropdown: {
+    width: "100%",
+    selectors: {
+      "&:focus": {
+        borderColor: "#0078d4",
+        boxShadow: "0 0 5px rgba(0, 120, 212, 0.5)",
+      },
+    },
+  },
+  root: {
+    width: "100%",
+  },
+  callout: {
+    maxHeight: "50vh",
+    overflowY: "auto",
+  },
+  dropdownItemsWrapper: {
+    maxHeight: "inherit",
+  },
+  title: {
+    borderColor: "#666666",
+    selectors: {
+      "&:hover": {
+        borderColor: "#333333",
+      },
+    },
+  },
 };
 
 const searchBoxStyles: Partial<ISearchBoxStyles> = {
@@ -33,7 +59,7 @@ export interface ILookupMultiSel {
   primaryEntityType: string;
   relationshipName: string;
   primaryEntityId: string;
-  isEnabled: boolean;
+  disabled: boolean;
 }
 
 export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
@@ -46,7 +72,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
     primaryEntityType,
     relationshipName,
     primaryEntityId,
-    isEnabled,
+    disabled,
   } = props;
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
   const [userOptions, setUserOptions] = React.useState<IDropdownOption[]>([]);
@@ -88,9 +114,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
    * Trigger onchange to update the property
    */
   React.useEffect(() => {
-    let selectedValueOptions: string[] = [];
-    selectedValueOptions.push(selectedValues.toString());
-    if (onChangeTriggered.current) onChange(selectedValueOptions);
+    if (onChangeTriggered.current) onChange(selectedValues);
   }, [selectedValues]);
 
   /**
@@ -226,7 +250,7 @@ export const LookupMultiSel = React.memo((props: ILookupMultiSel) => {
         onRenderCaretDown={onRenderCaretDown}
         onRenderOption={onRenderOption}
         onDismiss={() => setSearchText("")}
-        disabled={isEnabled}
+        disabled={disabled}
       />
       {/* </Stack> */}
     </>
