@@ -1,5 +1,3 @@
-# /d:/Prakash/Work/PCF/LookupMulSel/depoypcf.ps
-
 # Run npm build command
 npm run build
 
