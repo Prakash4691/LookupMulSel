@@ -6,6 +6,7 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
   private notifyOutputChanged: () => void;
   private selectedOptions: string[];
   private initialValues: string[];
+  private previousMultiSelectedValues: string | null = null;
 
   /**
    * Empty constructor.
@@ -25,9 +26,8 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     state: ComponentFramework.Dictionary
   ): void {
     this.notifyOutputChanged = notifyOutputChanged;
-    let initialSelectedValues = context.parameters.multiSelectedValues.raw!;
-    this.initialValues =
-      initialSelectedValues == null ? [] : initialSelectedValues.split(",");
+    // Initialize with empty array - values will be set in updateView when property becomes available
+    this.initialValues = [];
   }
 
   /**
@@ -38,6 +38,12 @@ export class LMS implements ComponentFramework.ReactControl<IInputs, IOutputs> {
   public updateView(
     context: ComponentFramework.Context<IInputs>
   ): React.ReactElement {
+    // Handle initial values from bound property - update when property becomes available or changes
+    const currentMultiSelectedValues = context.parameters.multiSelectedValues.raw;
+    if (currentMultiSelectedValues !== this.previousMultiSelectedValues) {
+      this.previousMultiSelectedValues = currentMultiSelectedValues;
+      this.initialValues = currentMultiSelectedValues == null ? [] : currentMultiSelectedValues.split(",").map(value => value.trim()).filter(value => value.length > 0);
+    }
     const props: ILookupMultiSel = {
       onChange: this.onChange,
       initialValues: this.initialValues,
