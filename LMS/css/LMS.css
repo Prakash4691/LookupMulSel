@@ -1,3 +1,4 @@
+/* Main dropdown styling */
 #MainDropDown span .IconButtonClass {
   height: 10px !important;
   background-color: transparent;
@@ -7,11 +8,36 @@
   height: auto;
   white-space: normal;
   text-overflow: clip;
+  min-height: 32px;
+  padding: 8px 40px 8px 12px; /* Add more padding-right to prevent overlap with search icon */
+  border: 1px solid #e1dfdd;
+  border-radius: 2px;
+  background-color: #ffffff;
+}
+
+.ms-Dropdown-title:hover {
+  border-color: #d2d0ce;
+}
+
+.ms-Dropdown-title:focus-within {
+  /* Neutral border when internal search field focused */
+  border-color: #e1dfdd;
+  box-shadow: none;
 }
 
 .ms-Checkbox-checkbox {
-  border: 0px;
-  border-radius: 10px;
+  border: 1px solid #605e5c;
+  border-radius: 50% !important;
+  width: 16px;
+  height: 16px;
+}
+
+.ms-Checkbox-checkbox:after {
+  border-radius: 50% !important;
+}
+
+.ms-Checkbox-checkmark {
+  border-radius: 50% !important;
 }
 
 .ms-Dropdown-container {
@@ -24,53 +50,335 @@
 }
 
 .ms-Dropdown:focus-within {
-  border-color: #0078d4 !important;
-  box-shadow: 0 0 5px rgba(0, 120, 212, 0.5);
+  /* Suppress outer blue focus styling; rely on input's subtle focus */
+  border-color: #e1dfdd !important;
+  box-shadow: none;
+  outline: none;
 }
 
 .ms-Dropdown:hover {
-  border-color: #333333;
+  border-color: #323130;
 }
 
 .ms-Callout {
   box-sizing: border-box;
+  border-radius: 2px;
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132),
+    0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+  border: 1px solid #e1dfdd;
 }
 
 .ms-Callout-main {
-  max-height: 50vh !important;
-  scrollbar-width: thin; /* For Firefox */
-}
-
-/* For WebKit browsers (Chrome, Safari) */
-.ms-Callout-main::-webkit-scrollbar {
-  width: 8px;
-}
-
-.ms-Callout-main::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.ms-Callout-main::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+  max-height: 200px !important;
 }
 
 /* Ensure dropdown items are properly sized */
 .ms-Dropdown-items {
-  padding: 4px 0;
+  padding: 0;
 }
 
 .ms-Dropdown-item {
-  padding: 0 8px;
-  line-height: 32px;
+  padding: 8px 12px;
+  line-height: 20px;
+  transition: background-color 0.1s ease;
+  font-size: 14px;
+}
+
+.ms-Dropdown-item:hover {
+  background-color: #f3f2f1;
+}
+
+.dropdown-option-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 14px;
 }
 
 /* Style for the magnifier icon */
 .ms-Dropdown-caretDown {
-  color: #666666;
-  transition: color 0.2s ease;
+  color: #605e5c;
+  transition: color 0.1s ease;
+  font-size: 16px;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
 }
 
-.ms-Dropdown:focus-within .ms-Dropdown-caretDown {
+.ms-Dropdown:focus-within .ms-Dropdown-caretDown,
+.ms-Dropdown:hover .ms-Dropdown-caretDown {
   color: #0078d4;
 }
+
+/* Selected items styling - Native model-driven app style */
+.placeholder-text {
+  color: #605e5c;
+  font-size: 14px;
+  font-style: normal;
+}
+
+.selected-items-container {
+  overflow: visible;
+  padding: 2px 0;
+  margin-right: 32px; /* Add margin to prevent overlap with search icon */
+  max-width: calc(
+    100% - 32px
+  ); /* Ensure container doesn't extend into icon area */
+}
+
+.selected-item-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #e1dfdd;
+  border-radius: 16px;
+  padding: 2px 8px 2px 12px;
+  margin: 2px 4px 2px 0;
+  font-size: 14px;
+  line-height: 18px;
+  max-width: 200px;
+  transition: all 0.1s ease;
+  color: #323130;
+  box-shadow: 0 0.9px 1.7px rgba(0, 0, 0, 0.08),
+    0 0.2px 0.4px rgba(0, 0, 0, 0.07);
+}
+
+.selected-item-chip:hover {
+  background-color: #f8f8f8;
+  border-color: #d2d0ce;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.132),
+    0 0.3px 0.9px rgba(0, 0, 0, 0.108);
+}
+
+.selected-item-text {
+  color: #0078d4;
+  font-weight: 400;
+  margin-right: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-decoration: none;
+}
+
+.remove-chip-button .ms-Button-icon {
+  font-size: 10px;
+  color: #605e5c;
+  transition: color 0.1s ease;
+}
+
+.remove-chip-button:hover .ms-Button-icon {
+  color: #d13438;
+}
+
+.remove-chip-button {
+  height: 16px !important;
+  width: 16px !important;
+  min-width: 16px !important;
+  border-radius: 50% !important;
+  background-color: transparent !important;
+  transition: all 0.1s ease;
+  border: none !important;
+}
+
+.remove-chip-button:hover {
+  background-color: #f3f2f1 !important;
+}
+
+.remove-chip-button:active {
+  background-color: #edebe9 !important;
+}
+
+/* Search box improvements */
+.ms-SearchBox {
+  margin: 8px 12px;
+  border-radius: 2px;
+  /* Remove any default border/outline so only the inner field displays one border */
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.ms-SearchBox-field {
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 2px;
+  border: 1px solid #d2d0ce !important; /* single uniform border */
+  background-color: #ffffff;
+}
+
+.ms-SearchBox-field:focus {
+  /* Subtle focus color and no extra ring */
+  border-color: #8ab4d9 !important; /* softer blue */
+  box-shadow: none !important;
+}
+
+/* Ensure wrapper doesn't reintroduce border when focused/active */
+.ms-SearchBox:focus-within {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Remove underline completely */
+.ms-SearchBox .ms-SearchBox-field::after {
+  display: none !important;
+}
+
+.ms-SearchBox.is-underlined .ms-SearchBox-field::after {
+  display: none !important;
+}
+
+/* No results message */
+.no-results-message {
+  display: flex;
+  align-items: center;
+  padding: 20px 18px 22px 18px; /* more roomy */
+  color: #323130;
+  font-style: normal;
+  font-size: 15px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf9f8 100%);
+  border: 1px dashed #c8c6c4;
+  border-radius: 4px;
+  margin: 4px 12px 8px 12px;
+  line-height: 20px;
+}
+
+.no-results-icon {
+  margin-right: 10px;
+  color: #8a8886;
+  font-size: 16px;
+}
+
+/* Loading and error states */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.error-container {
+  margin-bottom: 8px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Focus improvements */
+.ms-Dropdown:focus-visible {
+  /* Disable default outline for dropdown to prevent double outline with inner focused elements */
+  outline: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .selected-item-chip {
+    max-width: 160px;
+    font-size: 13px;
+    margin: 1px 2px 1px 0;
+    padding: 2px 6px 2px 10px;
+  }
+
+  .ms-Dropdown-title {
+    padding: 6px 8px;
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .selected-item-chip {
+    max-width: 140px;
+    padding: 1px 4px 1px 8px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+
+  .selected-item-text {
+    font-size: 12px;
+  }
+
+  .remove-chip-button {
+    height: 14px !important;
+    width: 14px !important;
+    min-width: 14px !important;
+  }
+
+  .remove-chip-button .ms-Button-icon {
+    font-size: 8px;
+  }
+
+  .ms-Dropdown-title {
+    padding: 6px 8px;
+    min-height: 30px;
+    font-size: 13px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .selected-item-chip {
+    border: 2px solid;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  .selected-item-text {
+    color: ButtonText;
+  }
+
+  .remove-chip-button:hover {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .selected-item-chip,
+  .ms-Dropdown-item,
+  .remove-chip-button {
+    transition: none;
+  }
+}
+
+/* --- Override residual outer focus ring around search field --- */
+/* Target the header wrapper that FluentUI injects before the search box */
+.ms-Dropdown-items
+  > li.ms-Dropdown-item[role="presentation"]:first-child:focus-within,
+.ms-Dropdown-items > li.ms-Dropdown-item[role="presentation"]:first-child:focus,
+.ms-Dropdown-items > li[role="presentation"] .ms-SearchBox:focus-visible,
+.ms-Dropdown-items > li[role="presentation"] .ms-SearchBox:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Remove default browser focus outline on the actual input element if any remains */
+.ms-SearchBox input.ms-SearchBox-field:focus-visible,
+.ms-SearchBox input.ms-SearchBox-field:focus {
+  outline: none !important;
+}
+
+/* If an outer blue 2px border is inserted via ::after pseudo element in some themes, hide it */
+.ms-SearchBox:after,
+.ms-SearchBox-field:after {
+  content: none !important;
+}
+
+/* Provide an alternative subtle focus style (commented out). Uncomment to re-enable accessible focus. */
+/*
+.ms-SearchBox input.ms-SearchBox-field:focus-visible {
+  outline: 2px solid #8ab4d9 !important;
+  outline-offset: 0; 
+}
+*/
